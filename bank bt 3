@@ -1,0 +1,60 @@
+// SPDX-License-Identifier: MIT
+ pragma solidity ^0.8.0;
+
+ /*
+ Simple Bank Smart Contract
+ Features:
+ - Deposit ETH
+ - Withdraw ETH (owner only)
+ - Check current balance
+ */
+
+ contract Bank {
+     address public owner;
+     uint256 private balance;
+
+     constructor() {
+         owner = msg.sender;
+         balance = 0;
+     }
+
+     // Deposit ETH into the contract
+     function deposit() public payable {
+         require(
+             msg.value > 0,
+             "Deposit amount must be greater than zero"
+         );
+
+         balance += msg.value;
+     }
+
+     // Withdraw ETH (only the owner can withdraw)
+     function withdraw(uint256 _amount) public {
+         require(
+             msg.sender == owner,
+             "Only owner can withdraw funds"
+         );
+
+         require(
+             _amount > 0,
+             "Withdrawal amount must be greater than zero"
+         );
+
+         require(
+             _amount <= balance,
+             "Insufficient balance"
+         );
+
+         // Update the balance before the external call
+         balance -= _amount;
+
+         // Transfer ETH to the owner
+         (bool success, ) = payable(owner).call{value: _amount}("");
+         require(success, "ETH transfer failed");
+     }
+
+     // Return the recorded account balance
+     function getBalance() public view returns (uint256) {
+         return balance;
+     }
+ }
