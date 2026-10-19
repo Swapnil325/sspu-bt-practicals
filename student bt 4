@@ -1,0 +1,64 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+/*
+    Student Data Contract
+    Features:
+    - Structure to store student details
+    - Dynamic array to hold student records
+    - Add and retrieve student details
+    - Accept plain ETH transfers using receive and fallback
+*/
+
+contract StudentData {
+
+    // Structure to hold student information
+    struct Student {
+        uint256 id;
+        string name;
+        uint8 age;
+    }
+
+    // Dynamic array of students
+    Student[] public students;
+
+    // Add a new student
+    function addStudent(
+        uint256 _id,
+        string memory _name,
+        uint8 _age
+    ) public {
+        require(bytes(_name).length > 0, "Name cannot be empty");
+        require(_age > 0, "Age must be greater than zero");
+
+        students.push(Student(_id, _name, _age));
+    }
+
+    // Get a student by index
+    function getStudent(
+        uint256 _index
+    ) public view returns (
+        uint256,
+        string memory,
+        uint8
+    ) {
+        require(_index < students.length, "Student does not exist");
+
+        Student memory s = students[_index];
+        return (s.id, s.name, s.age);
+    }
+
+    // Return the total number of students
+    function getStudentCount() public view returns (uint256) {
+        return students.length;
+    }
+
+    // Accept plain ETH transfers
+    receive() external payable {
+    }
+
+    // Handle ETH transfers with non-empty calldata
+    // or calls to non-existent function signatures
+    fallback() external payable {
+    }
+}
